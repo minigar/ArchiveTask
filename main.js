@@ -5,11 +5,12 @@ const fs = require("fs");
 const archiver = require("archiver");
 const bodyParser = require("body-parser");
 const { upload } = require("./index.vector-d");
+const { checkStringInFile } = require("./helpers/functions");
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "ejs");
 
-app.use('/download', express.static(path.join(__dirname, 'download')));
+app.use("/download", express.static(path.join(__dirname, "download")));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -19,23 +20,30 @@ app.post("/add-url", (req, res) => {
   const filePath = "file.txt";
   const newLine = "\n";
 
-  fs.appendFile(filePath, newLine + url + newLine, (err) => {
-    if (err) {
-      console.error("Error appending URL to file:", err);
-      return res.sendStatus(500);
-    }
+  const isHas = checkStringInFile(filePath, url);
 
-    console.log("URL added to file:", url);
+  if (!isHas) {
+    fs.appendFile(filePath, newLine + url + newLine, (err) => {
+      if (err) {
+        console.error("Error appending URL to file:", err);
+        return res.sendStatus(500);
+      }
+
+      console.log("URL added to file:", url);
+      upload();
+      res.sendStatus(200);
+    });
+  }
+
+  if (isHas) {
     upload();
     res.sendStatus(200);
-  });
+  }
 });
 
 app.get("/images", (req, res) => {
   const folderName = req.query.folder;
   const imgFolder = `download/${folderName}`;
-  const imageSize = parseInt(req.query.size);
-  const isFolderExists = fs.existsSync("download");
 
   fs.readdir(imgFolder, (err, files) => {
     if (err) {
@@ -43,22 +51,18 @@ app.get("/images", (req, res) => {
       return res.status(500).send("Server Error!");
     }
 
-    const filteredFiles = [];
+    const imgs = [];
 
     files.forEach((file) => {
       const filePath = `${imgFolder}/${file}`;
-      const stats = fs.statSync(filePath);
-      const fileSizeInBytes = stats.size;
 
-      if (fileSizeInBytes <= imageSize) {
-        filteredFiles.push({
-          name: file,
-          path: filePath,
-        });
-      }
+      imgs.push({
+        name: file,
+        path: filePath,
+      });
     });
 
-    res.render("images", { folderName, filteredFiles, isFolderExists });
+    res.render("images", { folderName, imgs });
   });
 });
 

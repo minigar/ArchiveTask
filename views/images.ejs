@@ -13,7 +13,7 @@
 <body>
     <h1>Images from <%= folderName %></h1>
     <a href="/download?name=<%= folderName %>">Download files in archive</a>
-    <% filteredFiles.forEach((file) => { %>
+    <% imgs.forEach((file) => { %>
       <div>
         <img src="../download/<%= folderName %>/<%= file.name %>" alt="<%= file.name %>" onload="updateDimensions(this)">
         <p id="dimensions-<%= file.name %>">Loading...</p>
@@ -22,10 +22,10 @@
 
   <script>
     function updateDimensions(image) {
-      var img = new Image();
+      let img = new Image();
       img.onload = function() {
-        var dimensionsId = "dimensions-" + image.alt;
-        var dimensionsElement = document.getElementById(dimensionsId);
+        let dimensionsId = "dimensions-" + image.alt;
+        let dimensionsElement = document.getElementById(dimensionsId);
         dimensionsElement.textContent = img.width + "px × " + img.height + "px";
       };
       img.src = image.src;
