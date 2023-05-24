@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Images</title>
+  <style>
+    img {
+      display: block;
+      height: 200px;
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+    <h1>Images from <%= folderName %></h1>
+    <a href="/download?name=<%= folderName %>">Download files in archive</a>
+    <% filteredFiles.forEach((file) => { %>
+      <div>
+        <img src="../download/<%= folderName %>/<%= file.name %>" alt="<%= file.name %>" onload="updateDimensions(this)">
+        <p id="dimensions-<%= file.name %>">Loading...</p>
+      </div>
+    <% }); %>
+
+  <script>
+    function updateDimensions(image) {
+      var img = new Image();
+      img.onload = function() {
+        var dimensionsId = "dimensions-" + image.alt;
+        var dimensionsElement = document.getElementById(dimensionsId);
+        dimensionsElement.textContent = img.width + "px × " + img.height + "px";
+      };
+      img.src = image.src;
+    }
+  </script>
+</body>
+</html>

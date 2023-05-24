@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Folders</title>
+</head>
+<body>
+  <h1>Folders</h1>
+
+  <ul>
+    <% folders.forEach((folder) => { %>
+      <li>
+        <a href="/images?folder=<%= folder %>&size=500000"><%= folder %></a>
+      </li>
+    <% }); %>
+  </ul>
+
+  <input type="text" id="urlInput" placeholder="Enter URL">
+  <button onclick="addUrlToFile()">Add URL to File</button> <br> <br> <br>
+  <a href="download/all">download all folders as archive</a>
+
+  <script>
+    function addUrlToFile() {
+      const urlInput = document.getElementById('urlInput');
+      const url = urlInput.value;
+
+      fetch('/add-url', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ url })
+      })
+        .then(response => {
+          if (response.ok) {
+            console.log('URL added successfully');
+          } else {
+            console.error('Error adding URL:', response.status);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+  </script>
+</body>
+</html>
