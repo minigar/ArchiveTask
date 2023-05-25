@@ -89,8 +89,10 @@ app.get("/", (req, res) => {
 });
 
 app.get("/download", (req, res) => {
-  let height = parseInt(req.query.height);
-  let width = parseInt(req.query.width);
+  let maxHeight = parseInt(req.query.maxHeight);
+  let minHeight = parseInt(req.query.minHeight);
+  let maxWidth = parseInt(req.query.maxWidth);
+  let minWidth = parseInt(req.query.minWidth);
 
   const output = fs.createWriteStream("archive.zip");
   const archive = archiver("zip", {
@@ -116,10 +118,26 @@ app.get("/download", (req, res) => {
     const filePath = `${imgFolder}/${file}`;
 
     const dimensions = sizeOf(filePath);
-    if (width <= dimensions.width && height <= dimensions.height) {
+    const imageWidth = dimensions.width;
+    const imageHeight = dimensions.height;
+
+    const withinHeightRange =
+      minHeight &&
+      minHeight <= imageHeight &&
+      maxHeight &&
+      maxHeight >= imageHeight;
+
+    const withinWidthRange =
+      minWidth &&
+      minWidth <= imageWidth &&
+      maxWidth &&
+      maxWidth >= imageWidth;
+
+    if (withinWidthRange && withinHeightRange) {
       archive.file(filePath, { name: file });
     }
-    if (!width && !height) {
+
+    if (!minWidth && !minHeight && !maxWidth && !maxHeight) {
       archive.file(filePath, { name: file });
     }
   });

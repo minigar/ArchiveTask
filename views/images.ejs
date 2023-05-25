@@ -15,8 +15,10 @@
 </head>
 <body>
     <h1>Images from <%= folderName %></h1>
-    <input type="text" placeholder="Enter min height" required id="height">  <br> <br>
-    <input type="text" placeholder="Enter min width" required  id="width">  <br> <br>
+    <input type="text" placeholder="Enter min height" required id="minHeight">  <br> <br>
+    <input type="text" placeholder="Enter max height" required id="maxHeight">  <br> <br>
+    <input type="text" placeholder="Enter min width" required  id="minWidth">  <br> <br>
+    <input type="text" placeholder="Enter max width" required  id="maxWidth">  <br> <br>
     <a href="#" onclick="generateDownloadLink()">Download files in archive</a>  <br> <br>
     <% imgs.forEach((file) => { %>
       <div>
@@ -37,23 +39,19 @@
     }
 
     function generateDownloadLink() {
-      let regex = /^(?:0|[1-9]\d*)$/
+      let regex = /^(?:0|[1-9]\d*)$/;
       const folderName = '<%= folderName %>';
-      const height = inputVal('height');
+      const minHeight = inputVal('minHeight');
+      const maxHeight = inputVal('maxHeight');
+      const minWidth = inputVal('minWidth');
+      const maxWidth = inputVal('maxWidth');
 
-      if(!regex.test(height)) {
-        alert('bad height request!')
+      if (!regex.test(minHeight) || !regex.test(maxHeight) || !regex.test(minWidth) || !regex.test(maxWidth)) {
+        alert('Invalid input. Please enter valid numeric values for height and width.');
         return;
       }
 
-      const width = inputVal('width');
-
-      if(!regex.test(width)) {
-        alert('bad width request!')
-        return;
-      }
-
-      const downloadLink = `/download?name=${folderName}&height=${height}&width=${width}`;
+      const downloadLink = `/download?name=${folderName}&minHeight=${minHeight}&maxHeight=${maxHeight}&minWidth=${minWidth}&maxWidth=${maxWidth}`;
       window.location.href = downloadLink;
     }
 
