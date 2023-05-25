@@ -6,6 +6,7 @@ const archiver = require("archiver");
 const bodyParser = require("body-parser");
 const { upload } = require("./index.vector-d");
 const { checkStringInFile } = require("./helpers/functions");
+const sizeOf = require("image-size");
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -42,6 +43,8 @@ app.post("/add-url", (req, res) => {
 });
 
 app.get("/images", (req, res) => {
+  let height = parseInt(req.query.height);
+  let width = parseInt(req.query.width);
   const folderName = req.query.folder;
   const imgFolder = `download/${folderName}`;
 
@@ -55,14 +58,26 @@ app.get("/images", (req, res) => {
 
     files.forEach((file) => {
       const filePath = `${imgFolder}/${file}`;
-
       imgs.push({
         name: file,
         path: filePath,
       });
     });
 
-    res.render("images", { folderName, imgs });
+    const filteredImgs = [];
+
+    imgs.forEach((img) => {
+      const filePath = `${imgFolder}/${img.name}`;
+      const dimensions = sizeOf(filePath);
+      if (width <= dimensions.width && height <= dimensions.height) {
+        filteredImgs.push(img);
+      }
+      if (!width && !height) {
+        filteredImgs.push(img);
+      }
+    });
+
+    res.render("images", { folderName, imgs: filteredImgs });
   });
 });
 
@@ -74,6 +89,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/download", (req, res) => {
+  let height = parseInt(req.query.height);
+  let width = parseInt(req.query.width);
+
   const output = fs.createWriteStream("archive.zip");
   const archive = archiver("zip", {
     zlib: { level: 9 },
@@ -96,7 +114,14 @@ app.get("/download", (req, res) => {
 
   files.forEach((file) => {
     const filePath = `${imgFolder}/${file}`;
-    archive.file(filePath, { name: file });
+
+    const dimensions = sizeOf(filePath);
+    if (width <= dimensions.width && height <= dimensions.height) {
+      archive.file(filePath, { name: file });
+    }
+    if (!width && !height) {
+      archive.file(filePath, { name: file });
+    }
   });
 
   archive.finalize();

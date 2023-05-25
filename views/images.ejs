@@ -8,11 +8,16 @@
       height: 200px;
       width: auto;
     }
+    input {
+      max-width: 100px;
+    }
   </style>
 </head>
 <body>
     <h1>Images from <%= folderName %></h1>
-    <a href="/download?name=<%= folderName %>">Download files in archive</a>
+    <input type="text" placeholder="Enter min height" required id="height">  <br> <br>
+    <input type="text" placeholder="Enter min width" required  id="width">  <br> <br>
+    <a href="#" onclick="generateDownloadLink()">Download files in archive</a>  <br> <br>
     <% imgs.forEach((file) => { %>
       <div>
         <img src="../download/<%= folderName %>/<%= file.name %>" alt="<%= file.name %>" onload="updateDimensions(this)">
@@ -29,6 +34,33 @@
         dimensionsElement.textContent = img.width + "px × " + img.height + "px";
       };
       img.src = image.src;
+    }
+
+    function generateDownloadLink() {
+      let regex = /^(?:0|[1-9]\d*)$/
+      const folderName = '<%= folderName %>';
+      const height = inputVal('height');
+
+      if(!regex.test(height)) {
+        alert('bad height request!')
+        return;
+      }
+
+      const width = inputVal('width');
+
+      if(!regex.test(width)) {
+        alert('bad width request!')
+        return;
+      }
+
+      const downloadLink = `/download?name=${folderName}&height=${height}&width=${width}`;
+      window.location.href = downloadLink;
+    }
+
+    function inputVal(id) {
+      const input = document.getElementById(id);
+      const inputVal = input.value || 1;
+      return inputVal;
     }
   </script>
 </body>
