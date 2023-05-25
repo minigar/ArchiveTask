@@ -41,10 +41,10 @@
     function generateDownloadLink() {
       let regex = /^(?:0|[1-9]\d*)$/;
       const folderName = '<%= folderName %>';
-      const minHeight = inputVal('minHeight');
-      const maxHeight = inputVal('maxHeight');
-      const minWidth = inputVal('minWidth');
-      const maxWidth = inputVal('maxWidth');
+      const minHeight = inputVal('minHeight', 1);
+      const maxHeight = inputVal('maxHeight', 10000);
+      const minWidth = inputVal('minWidth', 1);
+      const maxWidth = inputVal('maxWidth', 10000);
 
       if (!regex.test(minHeight) || !regex.test(maxHeight) || !regex.test(minWidth) || !regex.test(maxWidth)) {
         alert('Invalid input. Please enter valid numeric values for height and width.');
@@ -55,9 +55,9 @@
       window.location.href = downloadLink;
     }
 
-    function inputVal(id) {
+    function inputVal(id, defaultNum) {
       const input = document.getElementById(id);
-      const inputVal = input.value || 1;
+      const inputVal = input.value || defaultNum;
       return inputVal;
     }
   </script>
